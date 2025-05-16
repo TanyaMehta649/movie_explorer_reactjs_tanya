@@ -40,3 +40,8 @@
 .read-the-docs {
   color: #888;
 }
+@media (max-height: 447px) {
+  .grid-cols-height-small {
+    grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+  }
+}

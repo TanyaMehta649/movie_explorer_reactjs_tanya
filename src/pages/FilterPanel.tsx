@@ -63,7 +63,7 @@ const FilterPanel: React.FC = () => {
   };
 
   return (
-    <div className="bg-black text-white min-h-screen py-10 px-6">
+    <div className="bg-black  text-white min-h-screen py-10 px-20">
     
 
  
@@ -103,7 +103,9 @@ const FilterPanel: React.FC = () => {
       ) : (
         <>
     
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 pb-6">
+          {/* <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 pb-6 grid-cols-height-small"> */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 pb-6 force-grid-cols-1">
+
             {filteredMovies.map((movie) => (
               <MovieItemCard
                 key={movie.id}

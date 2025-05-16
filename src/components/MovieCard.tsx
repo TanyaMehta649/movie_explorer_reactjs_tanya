@@ -69,7 +69,7 @@ const renderSection = (title: string, sectionMovies: Movie[], cardWidth: string 
   return (
     <div className="mb-8 px-4">
       <h2 className="text-white text-lg font-semibold mb-3">{title}</h2>
-      <div className="flex flex-col sm:flex-row sm:overflow-x-auto sm:no-scrollbar sm:flex-nowrap sm:gap-4 sm:justify-start items-center gap-4">
+      <div className="flex flex-col w-full sm:flex-row sm:overflow-x-auto sm:no-scrollbar sm:flex-nowrap sm:gap-4 sm:justify-start items-center gap-4">
         {sectionMovies.map((movie) => (
           <MovieItemCard
             key={movie.id}
