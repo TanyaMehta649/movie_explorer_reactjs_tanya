@@ -70,7 +70,7 @@ const Success = () => {
   }, [location]);
 
   return (
-    <div className="bg-[#14141e] min-h-screen flex flex-col">
+    <div className="bg-[#14141e] min-h-screen overflow-x-hidden flex flex-col">
       <div className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-md bg-white text-black rounded-xl border border-white/10 p-8 text-center shadow-md">
           {loading ? (
