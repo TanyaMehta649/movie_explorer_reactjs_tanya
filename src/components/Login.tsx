@@ -44,7 +44,7 @@ try {
 
     const userWithPlan = {
       ...response,
-      plan: response.plan || response.plan_type || 'free' // also handle plan_type if API sends that
+      plan: response.plan || response.plan_type || 'free' 
     };
 
     localStorage.setItem('user', JSON.stringify(userWithPlan)); 
