@@ -1,5 +1,6 @@
 
 import React, { Component, ChangeEvent, FormEvent } from 'react';
+import { toast } from 'react-hot-toast';
 import 'react-phone-number-input/style.css';
 import PhoneInput from 'react-phone-number-input';
 import { isValidPhoneNumber } from 'react-phone-number-input';
@@ -44,7 +45,8 @@ class Signup extends Component<SignupProps, SignupState> {
     this.setState({ phone: value || '' });
   };
 
-  handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  
+handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (this.state.isSubmitting) return;
 
@@ -54,42 +56,45 @@ class Signup extends Component<SignupProps, SignupState> {
 
     const nameRegex = /^[A-Z][a-zA-Z]{2,}(?: [A-Z][a-zA-Z]{2,})*$/;
     if (!nameRegex.test(fullName)) {
-      alert('Full Name must start with a capital letter...');
+      toast.error('Full Name must start with a capital letter...');
       this.setState({ isSubmitting: false });
       return;
     }
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@(gmail|yahoo|ask)\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(email)) {
-      alert('Email must be valid with @gmail, @yahoo, or @ask...');
+      toast.error('Email must be valid with @gmail, @yahoo, or @ask...');
       this.setState({ isSubmitting: false });
       return;
     }
 
     if (!agreed) {
-      alert('Please agree to the Terms and Policy');
+      toast.error('Please agree to the Terms and Policy');
       this.setState({ isSubmitting: false });
       return;
     }
 
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%?&])[A-Za-z\d@$!%?&]{8,}$/;
     if (!passwordRegex.test(password)) {
-      alert('Password must meet complexity requirements');
+      toast.error('Password must meet complexity requirements');
       this.setState({ isSubmitting: false });
       return;
     }
 
     if (password !== confirmPassword) {
-      alert('Passwords do not match');
+      toast.error('Passwords do not match');
       this.setState({ isSubmitting: false });
       return;
     }
 
     if (!isValidPhoneNumber(phone)) {
-      alert('Please enter a valid phone number');
+      toast.error('Please enter a valid phone number');
       this.setState({ isSubmitting: false });
       return;
     }
+
+
+
 
     const payload = {
       name: fullName,
@@ -102,14 +107,14 @@ class Signup extends Component<SignupProps, SignupState> {
     try {
       const response = await signupApiCall(payload);
       if (response) {
-        alert('Signup successful!');
-        this.props.navigate('/'); // ✅ use navigate from props
+         toast.success('Signup successful!');
+        this.props.navigate('/dashboard'); 
       } else {
-        alert('Signup failed. Please try again.');
+         toast.error('Signup failed. Please try again.');
       }
     } catch (error) {
       console.error('Error during signup:', error);
-      alert('An error occurred during signup.');
+       toast.error('An error occurred during signup.');
     } finally {
       this.setState({ isSubmitting: false });
     }
@@ -117,7 +122,7 @@ class Signup extends Component<SignupProps, SignupState> {
 
   render() {
     return (
-      // JSX stays the same...
+    
       <div className="min-h-screen bg-black flex items-center justify-center px-4 sm:px-6 lg:px-8">
         <form
           onSubmit={this.handleSubmit}
@@ -200,9 +205,13 @@ class Signup extends Component<SignupProps, SignupState> {
 
           <p className="text-center mt-4 text-sm">
             Already have an account?{' '}
-            <a href="#" className="text-yellow-400 hover:underline">
+            <button
+              type="button"
+              onClick={() => this.props.navigate('/')}
+              className="text-yellow-400 hover:underline bg-transparent border-none cursor-pointer"
+            >
               Sign In
-            </a>
+            </button>
           </p>
         </form>
       </div>

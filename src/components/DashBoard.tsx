@@ -1,24 +1,37 @@
-import React from 'react'
-import Footer from './Footer'
-import Header from './Header'
-import LandingPage from './LandingPage'
-import { Car } from 'lucide-react'
-import MovieCard from './MovieCard'
-import SubscriptionPlan from '../pages/SubscriptionPlan'
+import React, { useEffect, useState } from 'react';
+import Footer from './Footer';
+import LandingPage from './LandingPage';
+import MovieCard from './MovieCard';
+import SubscriptionPlan from '../pages/SubscriptionPlan';
+
 function DashBoard() {
+  const [role, setRole] = useState<string | undefined>();
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        const parsed = JSON.parse(storedUser);
+        if (parsed && typeof parsed === "object") {
+          setRole(parsed.role);
+        }
+      } catch (err) {
+        console.warn("Invalid user data in localStorage:", err);
+      }
+    }
+  }, []);
+
   return (
     <div>
-<Header />
-<LandingPage />
-<MovieCard role="user" />
+      <LandingPage />
+      <MovieCard />
 
- <SubscriptionPlan />
-<Footer/>
+      {/* 👇 Only show SubscriptionPlan if NOT supervisor */}
+      {role !== 'supervisor' && <SubscriptionPlan />}
 
-
+      <Footer />
     </div>
-
-  )
+  );
 }
 
-export default DashBoard
+export default DashBoard;

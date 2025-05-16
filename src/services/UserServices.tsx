@@ -41,8 +41,6 @@ export const signupApiCall = (payload: SignupPayload) => {
       });
     };      
 
-
-
 interface loginPayload {
     email: string;
     password: string;

@@ -1,4 +1,5 @@
 
+import { toast } from 'react-hot-toast';
 
 
 import React, { useState } from 'react';
@@ -16,7 +17,7 @@ const Login: React.FC = () => {
   const handleLogin = async () => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@(gmail|yahoo|ask)\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(email)) {
-      alert(
+  toast.error(
         'Email must be a valid email with @gmail, @yahoo, or @ask and a valid domain (.com, .in, etc.).'
       );
       return;
@@ -25,7 +26,7 @@ const Login: React.FC = () => {
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%?&])[A-Za-z\d@$!%?&]{8,}$/;
     if (!passwordRegex.test(password)) {
-      alert(
+      toast.error(
         'Password must be at least 8 characters long, include one uppercase letter, one lowercase letter, one digit, and one special character.'
       );
       return;
@@ -39,24 +40,24 @@ try {
   console.log('Full Login Response:', response);
 
   if (response) {
-    alert('Login successful!');
+    toast.success('Login successful!');
 
     const userWithPlan = {
       ...response,
       plan: response.plan || response.plan_type || 'free' // also handle plan_type if API sends that
     };
 
-    localStorage.setItem('user', JSON.stringify(userWithPlan)); // ✅ only this line, no overwrite
+    localStorage.setItem('user', JSON.stringify(userWithPlan)); 
     localStorage.setItem('token', response.token);
 
     navigate('/dashboard');
     window.location.reload();
   } else {
-    alert('Login failed. Please check your credentials.');
+    toast.error('Login failed. Please check your credentials.');
   }
 } catch (error) {
   console.error('Error during login:', error);
-  alert('An error occurred during login.');
+  toast.error('An error occurred during login.');
 } finally {
   setLoading(false);
 }
@@ -90,7 +91,7 @@ try {
             className="w-full p-3 rounded-md bg-black border border-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-500"
           />
           <button
-            type="button"
+            type="button" data-testid="toggle-password"
             className="absolute right-3 top-3 text-gray-400"
             onClick={() => setShowPassword((prev) => !prev)}
           >

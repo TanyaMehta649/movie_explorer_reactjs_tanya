@@ -29,4 +29,23 @@ describe("Footer Component", () => {
     const year = new Date().getFullYear();
     expect(screen.getByText(`© ${year} Movie Explorer. All rights reserved.`)).toBeInTheDocument();
   });
+  test('renders main footer heading', () => {
+  render(<Footer />);
+  expect(screen.getByText("🎬 Movie Explorer")).toBeInTheDocument();
+});
+test('renders section headings', () => {
+  render(<Footer />);
+  expect(screen.getByText("Categories")).toBeInTheDocument();
+  expect(screen.getByText("Support")).toBeInTheDocument();
+});
+test('renders category links as anchor elements', () => {
+  render(<Footer />);
+  expect(screen.getByRole('link', { name: /movies/i })).toBeInTheDocument();
+});
+test('footer has correct class styling', () => {
+  render(<Footer />);
+  const footer = screen.getByRole('contentinfo'); 
+  expect(footer).toHaveClass('bg-black', 'text-gray-400', 'px-6', 'py-16');
+});
+
 });

@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Pencil, Trash2, Crown } from 'lucide-react';
 import { Movie } from '../services/MovieServices';
 import toast from 'react-hot-toast';
-
 interface Props {
   movie: Movie;
   userRole: string | null;
@@ -12,7 +11,6 @@ interface Props {
   onEdit: (movie: Movie) => void;
   onDelete: (id: number) => void;
 }
-
 const MovieItemCard: React.FC<Props> = ({
   movie,
   userRole,
@@ -22,7 +20,6 @@ const MovieItemCard: React.FC<Props> = ({
   onDelete
 }) => {
   const navigate = useNavigate();
-
   const handleCardClick = () => {
      console.log('User plan:', userPlan); 
   if (!isLoggedIn) {
@@ -34,7 +31,6 @@ const MovieItemCard: React.FC<Props> = ({
     navigate(`/movie/${movie.id}`);
     return;
   }
-
   if (!movie.premium) {
     navigate(`/movie/${movie.id}`);
     return;
@@ -47,20 +43,17 @@ const MovieItemCard: React.FC<Props> = ({
   navigate('/dashboard');
   window.scrollTo(0, document.body.scrollHeight / 1.6);
 };
-
-
-  return (
-    <div className="w-[10rem] flex flex-col">
-      <div className="relative w-full h-[15rem] cursor-pointer" onClick={handleCardClick}>
+return (
+    <div className="w-40  flex flex-col">
+      <div className="relative w-full aspect-[2/3] cursor-pointer" onClick={handleCardClick}>
         <img
           src={movie.poster_url}
           alt={movie.title}
-          className="w-full h-full object-cover rounded-lg border-2 border-transparent hover:border-yellow-400 transition duration-300"
+          className="w-full h-full  rounded-lg border-2 border-transparent hover:border-yellow-400 transition duration-300"
         />
-
-        {movie.premium === true && userPlan !== 'premium' && userRole !== 'supervisor' && (
-          <div className="absolute top-2 left-2 bg-yellow-400 p-1 rounded-full">
-            <Crown size={16} className="text-white" />
+{movie.premium === true && userPlan !== 'premium' && userRole !== 'supervisor' && (
+          <div className="absolute top-2 left-2 bg-yellow-400 p-1 rounded-full ">
+            <Crown size={16} className="text-white"  />
           </div>
         )}
         {userRole === 'supervisor' && (
@@ -75,7 +68,7 @@ const MovieItemCard: React.FC<Props> = ({
             >
               <Pencil size={16} />
             </button>
-            <button
+            <button data-testid="delete-btn-1"
               onClick={(e) => {
                 e.stopPropagation();
                 onDelete(movie.id);
@@ -94,5 +87,4 @@ const MovieItemCard: React.FC<Props> = ({
     </div>
   );
 };
-
 export default MovieItemCard;

@@ -1,14 +1,50 @@
 import React, { useEffect } from 'react';
-import Signup from './components/Signup';
-import Login from './components/Login';
 import './index.css';
 import { Toaster } from 'react-hot-toast';
-import  RoutingModule  from './routes/RoutingModule';
+import RoutingModule from './routes/RoutingModule';
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Carousel from './components/LandingPage';
 import { generateToken, messaging, onMessage } from './Notifications/firebase';
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, useLocation } from "react-router-dom";
+
+function LayoutWrapper() {
+  const location = useLocation();
+  const hideHeaderFooter = location.pathname === '/' || location.pathname === '/signup';
+
+  return (
+    <>
+      {!hideHeaderFooter && <Header />}
+ <Toaster
+  position="top-right"
+  toastOptions={{
+    duration: 8000,
+    style: {
+      background: '#333',
+      color: '#fff',
+      borderRadius: '10px',
+      padding: '14px 20px',
+      fontSize: '15px',
+    },
+    success: {
+      style: {
+        background: '#22c55e', 
+        color: '#fff',
+      },
+    },
+    error: {
+      style: {
+        background: '#ef4444', 
+        color: '#fff',
+      },
+    },
+  }}
+/>
+      <RoutingModule />
+      {!hideHeaderFooter && <Footer />}
+    </>
+  );
+}
 
 function App() {
   useEffect(() => {
@@ -17,17 +53,11 @@ function App() {
       console.log("Foreground message received:", payload);
     });
   }, []);
+
   return (
-    <>
-     <Toaster position="top-right" />
-    
     <BrowserRouter>
-    <RoutingModule />
+      <LayoutWrapper />
     </BrowserRouter>
-    </>
-
-
-
   );
 }
 

@@ -1,8 +1,7 @@
-
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Movie, getAllMoviesPagination, searchByTitle } from '../services/MovieServices';
-import Header from '../components/Header';
+
 import { Pencil, Trash2 } from 'lucide-react';
 import { deleteMovie } from '../services/MovieServices';
 import MovieItemCard from '../components/MovieItemCard';
@@ -20,30 +19,18 @@ const FilterPanel: React.FC = () => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const userRole = user?.role;
   const navigate = useNavigate();
-  const location = useLocation();
 
   useEffect(() => {
-    // Parse current page from URL
-    const urlParams = new URLSearchParams(location.search);
-    const page = urlParams.get('page');
-    setCurrentPage(page ? parseInt(page) : 1);
-  }, [location]);
+    const fetchFiltered = async () => {
+      setLoading(true);
+      const results = await getAllMoviesPagination(currentPage);
+      setFilteredMovies(results.movies);
+      setTotalPages(results.pagination.total_pages);
+      setLoading(false);
+    };
 
- useEffect(() => {
-  const urlParams = new URLSearchParams(location.search);
-  const page = parseInt(urlParams.get('page') || '1');
-
-  const fetchFiltered = async () => {
-    setLoading(true);
-    const results = await getAllMoviesPagination(page);
-    setFilteredMovies(results.movies);
-    setTotalPages(results.pagination.total_pages);
-    setCurrentPage(page); // ✅ Ensure state is synced too
-    setLoading(false);
-  };
-
-  fetchFiltered();
-}, [location.search]); // ✅ Trigger fetch on URL change
+    fetchFiltered();
+  }, [currentPage]);
 
   useEffect(() => {
     const fetchFilteredBySearchAndGenre = async () => {
@@ -75,15 +62,11 @@ const FilterPanel: React.FC = () => {
     }
   };
 
-  const updatePageInUrl = (page: number) => {
-    // Update the URL with the current page number
-    navigate(`/filterpanel?page=${page}`, { replace: true });
-  };
-
   return (
     <div className="bg-black text-white min-h-screen py-10 px-6">
-      <Header />
+    
 
+ 
       <div className="flex justify-center mb-4">
         <input
           type="text"
@@ -94,6 +77,7 @@ const FilterPanel: React.FC = () => {
         />
       </div>
 
+   
       <div className="flex flex-wrap gap-3 justify-center my-6">
         {genres.map((genre) => (
           <button
@@ -110,42 +94,41 @@ const FilterPanel: React.FC = () => {
         ))}
       </div>
 
+    
       {loading ? (
         <div className="flex justify-center items-center h-40">
-          <div className="w-10 h-10 border-4 border-yellow-400 border-dashed rounded-full animate-spin"></div>
+          <div role="status"
+  aria-label="Loading" className="w-10 h-10  border-4 border-yellow-400 border-dashed rounded-full animate-spin"></div>
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pb-6 w-full max-w-7xl mx-auto px-4">
+    
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 pb-6">
             {filteredMovies.map((movie) => (
               <MovieItemCard
                 key={movie.id}
                 movie={movie}
                 userRole={userRole}
+                userPlan={user?.plan || 'free'} 
+                isLoggedIn={!!user} 
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+             
               />
             ))}
           </div>
 
+         
           <div className="flex justify-center mt-6">
             <button
-              onClick={() => {
-                const newPage = Math.max(currentPage - 1, 1);
-                setCurrentPage(newPage);
-                updatePageInUrl(newPage);
-              }}
+              onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
               className="px-4 py-2 mx-2 bg-yellow-400 text-black rounded-full"
             >
               Previous
             </button>
             <span className="text-white">{`Page ${currentPage} of ${totalPages}`}</span>
             <button
-              onClick={() => {
-                const newPage = Math.min(currentPage + 1, totalPages);
-                setCurrentPage(newPage);
-                updatePageInUrl(newPage);
-              }}
+              onClick={() => setCurrentPage(Math.min(currentPage + 1, totalPages))}
               className="px-4 py-2 mx-2 bg-yellow-400 text-black rounded-full"
             >
               Next

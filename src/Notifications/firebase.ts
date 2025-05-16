@@ -1,5 +1,10 @@
 import { initializeApp } from "firebase/app";
-import { deleteToken, getMessaging, getToken, onMessage } from "firebase/messaging";
+import {
+  deleteToken,
+  getMessaging,
+  getToken,
+  onMessage,
+} from "firebase/messaging";
 import { sendTokenToBackend } from "../services/UserServices";
 
 const firebaseConfig = {
@@ -12,53 +17,39 @@ const firebaseConfig = {
   measurementId: "G-VHTF0G8C2K"
 };
 
-
 const app = initializeApp(firebaseConfig);
 export const messaging = getMessaging(app);
 
 export const generateToken = async () => {
   try {
-    // Check if permission is already granted
-    if (Notification.permission === "granted") {
-      const vapidKey = "BC-X5xRxSuqmP23YIvvnmFEeLlttSgvWm4J7yTUvutVlN7RHUra21Wu-mQf-bnzvgSsrYxo8hMwlY_nt-sZsaRg";
-      const token = await getToken(messaging, { vapidKey }).catch(async (error) => {
-        if (error.code === "messaging/token-unsubscribed" || error.code === "messaging/invalid-token") {
-          console.log("Existing token invalid or unsubscribed, generating new token");
-          await deleteToken(messaging).catch(() => console.log("No token to delete"));
-          return await getToken(messaging, { vapidKey });
-        }
-        throw error;
-      });
+    const registration = await navigator.serviceWorker.register(
+      "/firebase-messaging-sw.js"
+    );
+    console.log("Service Worker registered:", registration);
 
-      if (token && typeof token === "string" && token.length >= 50) {
-        console.log("Existing FCM Token:", token);
-        await sendTokenToBackend(token);
-        return token;
-      }
+    const permission = await Notification.requestPermission();
+    console.log("Notification permission:", permission);
+    if (permission !== "granted") {
+      console.warn("Notification permission not granted:", permission);
+      return null;
     }
 
-    // Request permission if not granted
-    if (Notification.permission !== "granted") {
-      const permission = await Notification.requestPermission();
-      console.log("Notification permission:", permission);
-      if (permission !== "granted") {
-        console.warn("Notification permission not granted:", permission);
-        return null;
-      }
-    }
+    const vapidKey =
+      "BC-X5xRxSuqmP23YIvvnmFEeLlttSgvWm4J7yTUvutVlN7RHUra21Wu-mQf-bnzvgSsrYxo8hMwlY_nt-sZsaRg";
 
-    // Generate new token
-    const vapidKey = "BC-X5xRxSuqmP23YIvvnmFEeLlttSgvWm4J7yTUvutVlN7RHUra21Wu-mQf-bnzvgSsrYxo8hMwlY_nt-sZsaRg";
-    const token = await getToken(messaging, { vapidKey });
-    console.log("New FCM Token:", token);
+    const token = await getToken(messaging, {
+      vapidKey,
+      serviceWorkerRegistration: registration,
+    });
 
     if (!token || typeof token !== "string" || token.length < 50) {
       console.warn("Generated token appears invalid");
       return null;
     }
 
-    await sendTokenToBackend(token);
-    console.log("Token sent to backend:", token);
+    console.log("New FCM Token:", token);
+    sendTokenToBackend(token);
+
     return token;
   } catch (error) {
     console.error("Error generating FCM token or sending to backend:", error);
@@ -68,23 +59,32 @@ export const generateToken = async () => {
 
 export const monitorToken = async () => {
   try {
-    const vapidKey = "BC-X5xRxSuqmP23YIvvnmFEeLlttSgvWm4J7yTUvutVlN7RHUra21Wu-mQf-bnzvgSsrYxo8hMwlY_nt-sZsaRg";
-    const token = await getToken(messaging, { vapidKey }).catch(async (error) => {
-      if (error.code === "messaging/token-unsubscribed" || error.code === "messaging/invalid-token") {
-        console.log("Token invalid or unsubscribed, generating new token");
-        const newToken = await generateToken();
-        return newToken;
+    const vapidKey =
+      "BC-X5xRxSuqmP23YIvvnmFEeLlttSgvWm4J7yTUvutVlN7RHUra21Wu-mQf-bnzvgSsrYxo8hMwlY_nt-sZsaRg";
+    const token = await getToken(messaging, { vapidKey }).catch(
+      async (error) => {
+        if (
+          error.code === "messaging/token-unsubscribed" ||
+          error.code === "messaging/invalid-token"
+        ) {
+          console.log("Token invalid or unsubscribed, generating new token");
+          await deleteToken(messaging).catch(() =>
+            console.log("No token to delete")
+          );
+          const newToken = await getToken(messaging, { vapidKey });
+          console.log("New FCM Token (refreshed):", newToken);
+          return newToken;
+        }
+        throw error;
       }
-      throw error;
-    });
-
-    if (token && typeof token !== "string" || token.length < 50) {
-      console.warn("Monitored token appears invalid");
-      return null;
+    );
+    if (token) {
+      if (typeof token !== "string" || token.length < 50) {
+        console.warn("Monitored token appears invalid");
+        return null;
+      }
+      console.log("Token validated:", token);
     }
-
-    console.log("Token validated:", token);
-    await sendTokenToBackend(token);
     return token;
   } catch (error) {
     console.error("Error monitoring FCM token:", error);

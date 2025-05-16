@@ -66,4 +66,33 @@ describe("Header Component", () => {
     expect(screen.getByText(/About Us/i)).toBeInTheDocument();
     expect(screen.getByText(/Contact Us/i)).toBeInTheDocument();
   });
+ 
+  
+  
+
+  
+test("displays user email and role in dropdown", () => {
+  setLocalStorage("user", {
+    username: "Tanya",
+    email: "tanya@example.com",
+    role: "viewer"
+  });
+
+  renderWithRouter();
+  fireEvent.click(screen.getByTitle("Profile"));
+
+  expect(screen.getByText(/Email: tanya@example.com/i)).toBeInTheDocument();
+  expect(screen.getByText(/Role: viewer/i)).toBeInTheDocument();
+});
+test("shows fallback values when user data is incomplete", () => {
+  setLocalStorage("user", {});
+
+  renderWithRouter();
+  fireEvent.click(screen.getByTitle("Profile"));
+
+  expect(screen.getByText(/Welcome, User/i)).toBeInTheDocument();
+  expect(screen.getByText(/Email: user@example.com/i)).toBeInTheDocument();
+  expect(screen.getByText(/Role: user/i)).toBeInTheDocument();
+});
+
 });

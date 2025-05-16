@@ -9,21 +9,60 @@ const LandingPage: React.FC = () => {
   const [current, setCurrent] = useState(0);
   const [animating, setAnimating] = useState(false);
   const [expandedDescriptions, setExpandedDescriptions] = useState<Set<number>>(new Set());
+const [subscription, setSubscription] = useState<any>(null);
+const [planDuration, setPlanDuration] = useState<string>('');
 
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await getAllMovies();
-      if (initialMovies.length === 0) {
-        setInitialMovies(data);
+    const fetchInitialData = async () => {
+      try {
+        if (initialMovies.length === 0) {
+          const movies = await getAllMovies();
+          setInitialMovies(movies);
+        }
+
+        const token = localStorage.getItem('token');
+        if (token) {
+          const data = await getSubscriptionStatus(token);
+          const plan = data; 
+           localStorage.setItem("data", data.subscription.plan_type); 
+
+
+          if (data.subscription?.created_at && data.subscription?.expires_at) {
+            const createdAt = new Date(data.subscription.created_at);
+            const expiresAt = new Date(data.subscription.expires_at);
+
+            if (!isNaN(createdAt.getTime()) && !isNaN(expiresAt.getTime())) {
+              const msInDay = 1000 * 60 * 60 * 24;
+              const diffDays = Math.round((expiresAt.getTime() - createdAt.getTime()) / msInDay);
+
+              let duration = `${diffDays} days`;
+              if (diffDays >= 27 && diffDays <= 31) {
+                duration = '1 month';
+              } else if (diffDays >= 85 && diffDays <= 95) {
+                duration = '3 months';
+              } else if (diffDays === 1) {
+                duration = '1 day';
+              }
+
+              setPlanDuration(duration);
+              console.log('Plan duration set to:', duration);
+            } else {
+              setPlanDuration('Invalid plan dates');
+            }
+          } else {
+            setPlanDuration('No active plan');
+          }
+        } else {
+          setPlanDuration('Not logged in');
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setPlanDuration('Error fetching plan');
       }
     };
-    fetchData();
-   const token = localStorage.getItem('token');
-if (token) {
-  getSubscriptionStatus(token);
-}
- 
-  }, [initialMovies.length]);
+
+    fetchInitialData();
+  }, []);
 
   const prevSlide = () => {
     setCurrent((prev) => (prev - 1 + initialMovies.length) % initialMovies.length);
@@ -79,7 +118,27 @@ if (token) {
   }
 
   return (
+    <>
+    {planDuration && (
+      <div style={{
+        position: 'static',
+        top: 10,
+        left: 260,
+        backgroundColor: 'black',
+        color: 'white',
+        padding: '10px 20px',
+        fontWeight: 'bold',
+        zIndex: 9999,
+        borderRadius: '8px',
+        fontSize: '16px',
+      }}>
+        Plan: {planDuration}
+      </div>
+    )}
+
     <div className="relative w-full h-screen bg-black overflow-hidden flex items-center justify-center">
+      
+
       <div className="relative w-[100%] max-w-[2100px] h-[690px] bg-black shadow-2xl overflow-hidden">
         <div className="absolute inset-0">
           {initialMovies.map((movie, index) => (
@@ -140,6 +199,7 @@ if (token) {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

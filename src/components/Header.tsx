@@ -63,13 +63,18 @@ const Header: FC = () => {
 
 
   <nav className="flex-1 flex justify-center items-center flex-wrap gap-4 sm:gap-6 text-sm overflow-x-auto">
-    <Link to="/" className="text-white font-medium border-b border-white pb-0.5 whitespace-nowrap">Home</Link>
+    <Link to="/dashboard" className="text-white font-medium border-b border-white pb-0.5 whitespace-nowrap">Home</Link>
     <Link to="/aboutus" className="text-gray-400 hover:text-white whitespace-nowrap">About Us</Link>
     <Link to="/filterpanel" className="text-gray-400 hover:text-white whitespace-nowrap">Genre</Link>
+    {role !== "supervisor" && (
+    <Link to="/subscription" className="text-gray-400 hover:text-white whitespace-nowrap">
+      Subscription
+    </Link>
+  )}
     {role === "supervisor" && (
       <Link to="/addmovie" className="text-yellow-400 hover:text-white whitespace-nowrap">Add Movie</Link>
     )}
-    <Link to="/footer" className="text-gray-400 hover:text-white whitespace-nowrap">Contact Us</Link>
+
   </nav>
 
   
@@ -80,6 +85,7 @@ const Header: FC = () => {
         onClick={() => setShowDropdown((prev) => !prev)}
       />
     </div>
+
 
     <div
       ref={dropdownRef}

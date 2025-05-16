@@ -1,4 +1,8 @@
-
+const navigateMock = jest.fn();
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useNavigate: () => navigateMock,
+}));
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
@@ -8,7 +12,9 @@ import { MemoryRouter } from 'react-router-dom';
 describe('Login Component', () => {
   beforeEach(() => {
     window.alert = jest.fn();
+     navigateMock.mockClear(); 
   });
+
 
 test('renders login form with email and password fields', () => {
   render(
@@ -97,6 +103,41 @@ test('allows typing in email and password fields', () => {
     expect(passwordInput).toHaveValue('Password123!');
 
   });
+  test('toggles password visibility when eye icon is clicked', () => {
+  render(
+    <BrowserRouter>
+      <Login />
+    </BrowserRouter>
+  );
+
+  const passwordInput = screen.getByPlaceholderText(/password/i);
+  const toggleButton = screen.getByTestId('toggle-password');
+
+ 
+  expect(passwordInput).toHaveAttribute('type', 'password');
+
+
+  fireEvent.click(toggleButton);
+  expect(passwordInput).toHaveAttribute('type', 'text');
+
+
+  fireEvent.click(toggleButton);
+  expect(passwordInput).toHaveAttribute('type', 'password');
+});
+test('navigates to signup page on click', () => {
+  render(
+    <BrowserRouter>
+      <Login />
+    </BrowserRouter>
+  );
+
+  const signupButton = screen.getByRole('button', { name: /sign up/i });
+  fireEvent.click(signupButton);
+
+  expect(navigateMock).toHaveBeenCalledWith('/signup');
+});
+
+
  
    
 

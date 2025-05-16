@@ -6,7 +6,7 @@ const Footer: FC = () => {
     <footer className="bg-black text-gray-400 px-6 py-16 text-sm mt-32">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left">
 
-        {/* Logo / About */}
+   
         <div className="flex flex-col gap-4">
           <h3 className="text-white text-lg font-bold">🎬 Movie Explorer</h3>
           <p>

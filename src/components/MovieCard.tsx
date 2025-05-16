@@ -64,7 +64,7 @@ useEffect(() => {
   };
 
 const renderSection = (title: string, sectionMovies: Movie[], cardWidth: string = 'w-40') => {
-  const currentUser = JSON.parse(localStorage.getItem("user") || '{}'); // Safely parse currentUser
+  const currentUser = JSON.parse(localStorage.getItem("user") || '{}'); 
 
   return (
     <div className="mb-8 px-4">
