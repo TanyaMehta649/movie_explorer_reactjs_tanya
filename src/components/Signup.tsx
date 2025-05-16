@@ -108,7 +108,7 @@ handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
       const response = await signupApiCall(payload);
       if (response) {
          toast.success('Signup successful!');
-        this.props.navigate('/dashboard'); 
+        this.props.navigate('/'); 
       } else {
          toast.error('Signup failed. Please try again.');
       }
