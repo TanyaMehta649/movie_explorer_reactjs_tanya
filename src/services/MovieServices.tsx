@@ -88,43 +88,81 @@ export const searchByTitle = async (searchTerm: string, genre: string) => {
     };
   }
      
+  // export const getAllMoviesPagination = async (page: number = 1): Promise<MovieResponse> => {
+  //   try {
+  //     const response = await axios.get( `${API_URL}?page=${page}`, {
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Accept': 'application/json',
+  //       },
+  //     });
+  
+      // const data = response.data;
+  
+      // const movieData: MovieResponse = {
+      //   movies: data.movies || [],
+      //   pagination: data.pagination || {
+      //     current_page: data.current_page || page,
+      //     total_pages: data.total_pages || 1,
+      //     total_count: data.total_count || data.movies?.length || 0,
+      //     per_page: data.per_page || 10,
+      //   },
+      // };
+  
+      // console.log('Fetched movies:', movieData);
+      // return movieData;
+  
+  //   } catch (error: any) {
+  //     console.error('Error fetching movies:', error.message);
+  //     return {
+  //       movies: [],
+  //       pagination: {
+  //         current_page: page,
+  //         total_pages: 1,
+  //         total_count: 0,
+  //         per_page: 8,
+  //       },
+  //     };
+  //   }
+  // };
   export const getAllMoviesPagination = async (page: number = 1): Promise<MovieResponse> => {
-    try {
-      const response = await axios.get( `${API_URL}?page=${page}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      });
-  
-      const data = response.data;
-  
-      const movieData: MovieResponse = {
-        movies: data.movies || [],
-        pagination: data.pagination || {
-          current_page: data.current_page || page,
-          total_pages: data.total_pages || 1,
-          total_count: data.total_count || data.movies?.length || 0,
-          per_page: data.per_page || 10,
-        },
-      };
-  
-      console.log('Fetched movies:', movieData);
-      return movieData;
-  
-    } catch (error: any) {
-      console.error('Error fetching movies:', error.message);
-      return {
-        movies: [],
-        pagination: {
-          current_page: page,
-          total_pages: 1,
-          total_count: 0,
-          per_page: 8,
-        },
-      };
-    }
-  };
+  try {
+    const response = await axios.get(`${API_URL}?page=${page}&per_page=12`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    });
+
+    const data = response.data;
+
+    const movieData: MovieResponse = {
+      movies: data.movies || [],
+      pagination: data.pagination || {
+        current_page: data.current_page || page,
+        total_pages: data.total_pages || 1,
+        total_count: data.total_count || data.movies?.length || 0,
+        per_page: data.per_page || 12,  
+      },
+    };
+
+    console.log('Fetched movies:', movieData);
+    return movieData;
+
+  } catch (error: any) {
+    console.error('Error fetching movies:', error.message);
+    return {
+      movies: [],
+      pagination: {
+        current_page: page,
+        total_pages: 1,
+        total_count: 0,
+        per_page: 12,  // fallback per_page to 12
+      },
+    };
+  }
+};
+
   export const updateMovie = async (id: number, formData: FormData) => {
     const token = localStorage.getItem('token');
     try {

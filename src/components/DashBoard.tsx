@@ -26,7 +26,6 @@ function DashBoard() {
       <LandingPage />
       <MovieCard />
 
-      {/* 👇 Only show SubscriptionPlan if NOT supervisor */}
       {role !== 'supervisor' && <SubscriptionPlan />}
 
       <Footer />

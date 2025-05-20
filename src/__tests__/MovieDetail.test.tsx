@@ -152,7 +152,6 @@ describe('MovieDetail Component', () => {
       </MemoryRouter>
     );
 
-    // Test that navigation happens when the user is not logged in
-    // You may want to check that a redirect to login or a specific page occurs
+   
   });
 });
