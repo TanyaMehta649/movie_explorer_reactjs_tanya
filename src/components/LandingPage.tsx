@@ -2,13 +2,13 @@
 import React, { useEffect, useState } from 'react';
 import { getAllMovies, Movie } from '../services/MovieServices';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
 const LandingPage: React.FC = () => {
-  const [initialMovies, setInitialMovies] = useState<Movie[]>([]); 
+  const [initialMovies, setInitialMovies] = useState<Movie[]>([]);
   const [current, setCurrent] = useState(0);
   const [animating, setAnimating] = useState(false);
   const [expandedDescriptions, setExpandedDescriptions] = useState<Set<number>>(new Set());
-
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -79,12 +79,7 @@ const LandingPage: React.FC = () => {
   }
 
   return (
-    <>
-    
-
     <div className="relative w-full h-screen bg-black overflow-hidden flex items-center justify-center">
-      
-
       <div className="relative w-[100%] max-w-[2100px] h-[690px] bg-black shadow-2xl overflow-hidden">
         <div className="absolute inset-0">
           {initialMovies.map((movie, index) => (
@@ -94,18 +89,38 @@ const LandingPage: React.FC = () => {
               style={{ backgroundImage: `url(${movie.banner_url})` }}
             >
               {index === current && (
-                <div className="absolute top-30 left-4 sm:top-32 sm:left-24 text-white w-[90%] sm:w-80 space-y-2 sm:space-y-4">
-                  <h2 className="text-lg sm:text-xl md:text-3xl font-bold uppercase animate-slideUp">{movie.title}</h2>
-                  <p className={`${expandedDescriptions.has(movie.id) ? '' : 'line-clamp-3'} animate-fadein delay-200 text-xs sm:text-sm md:text-base`}>
+                <div
+                  key={current}
+                  className="absolute top-30 left-4 sm:top-32 sm:left-24 text-white w-[90%] sm:w-80 space-y-2 sm:space-y-4"
+                >
+                  <motion.h2
+                    initial={{ opacity: 0, y: 40 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, ease: 'easeOut' }}
+                    className="text-lg sm:text-xl md:text-3xl font-bold uppercase"
+                  >
+                    {movie.title}
+                  </motion.h2>
+
+                  <motion.p
+                    initial={{ opacity: 0, y: 40 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 1, ease: 'easeOut', delay: 0.2 }}
+                    className={`${expandedDescriptions.has(movie.id) ? '' : 'line-clamp-3'} text-xs sm:text-xs md:text-base`}
+                  >
                     {movie.description}
-                  </p>
+                  </motion.p>
+
                   {movie.description.length > 200 && (
-                    <button
+                    <motion.button
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.9, ease: 'easeOut', delay: 0.4 }}
                       onClick={() => toggleDescription(movie.id)}
-                      className="px-4 py-2 bg-white text-black rounded shadow hover:bg-gray-200 transition"
+                      className="px-4 py-2 bg-white text-black rounded shadow hover:bg-gray-200 transition sm:text-xs"
                     >
                       {expandedDescriptions.has(movie.id) ? 'See Less' : 'See More'}
-                    </button>
+                    </motion.button>
                   )}
                 </div>
               )}
@@ -129,10 +144,10 @@ const LandingPage: React.FC = () => {
         </div>
 
         <div className="absolute bottom-16 sm:bottom-20 left-[74%] -translate-x-1/2 z-30 flex gap-4">
-          {[ 
-            (current - 1 + initialMovies.length) % initialMovies.length, 
-            current,                                      
-            (current + 1) % initialMovies.length                  
+          {[
+            (current - 1 + initialMovies.length) % initialMovies.length,
+            current,
+            (current + 1) % initialMovies.length,
           ].map((index) => (
             <img
               key={initialMovies[index].id}
@@ -145,7 +160,6 @@ const LandingPage: React.FC = () => {
         </div>
       </div>
     </div>
-    </>
   );
 };
 

@@ -10,7 +10,9 @@ const MovieDetails = () => {
   const { id } = useParams();
   const [movie, setMovie] = useState<any>(null);
   const [relatedMovies, setRelatedMovies] = useState<any[]>([]);
-
+useEffect(() => {
+  window.scrollTo(0, 0);  
+}, []);
   useEffect(() => {
     const fetchMovie = async () => {
       try {
@@ -36,6 +38,7 @@ const MovieDetails = () => {
 
     fetchMovie();
   }, [id]);
+
 
   useEffect(() => {
     const fetchRelatedMovies = async () => {
@@ -123,11 +126,9 @@ const MovieDetails = () => {
           <img
             src={rel.poster_url}
             alt={rel.title}
-            className="w-full h-[250px] object-cover"
+            className="w-full h-full object-cover"
           />
-          <div className="p-2 flex-1 flex items-center justify-center text-center">
-            <h3 className="text-md font-semibold text-white line-clamp-2">{rel.title}</h3>
-          </div>
+         
         </div>
       ))}
     </div>

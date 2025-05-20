@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import './index.css';
 import { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast'
 import RoutingModule from './routes/RoutingModule';
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -10,7 +11,7 @@ import { BrowserRouter, useLocation } from "react-router-dom";
 
 function LayoutWrapper() {
   const location = useLocation();
-  const hideHeaderFooter = location.pathname === '/' || location.pathname === '/signup';
+  const hideHeaderFooter = location.pathname === '/' || location.pathname === '/signup' || location.pathname==='/cancelpayment' || location.pathname==='/success';
 
   return (
     <>
@@ -48,11 +49,18 @@ function LayoutWrapper() {
 
 function App() {
   useEffect(() => {
-    generateToken();
-    onMessage(messaging, (payload) => {
-      console.log("Foreground message received:", payload);
-    });
-  }, []);
+  generateToken();
+
+  onMessage(messaging, (payload) => {
+    console.log("Foreground message received:", payload);
+
+    const { title, body } = payload.notification || {};
+
+    if (title && body) {
+      toast(`${title}: ${body}`);
+    }
+  });
+}, []); 
 
   return (
     <BrowserRouter>

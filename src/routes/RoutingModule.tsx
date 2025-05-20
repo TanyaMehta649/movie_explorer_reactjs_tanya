@@ -13,7 +13,7 @@ import Success from "../pages/Success";
 import ProtectedRoute from "./ProtectedRoute";
 import SubscriptionPlan from "../pages/SubscriptionPlan";
 import FilterPanel from '../pages/FilterPanel'
-
+import CancelPayment from '../pages/CancelPayment'
 const RoutingModule: React.FC = () => {
   return (
     <Routes>
@@ -28,6 +28,8 @@ const RoutingModule: React.FC = () => {
 
       <Route path="/aboutus" element={<AboutUs />} />
       <Route path="/success" element={<Success />} />
+      <Route path="/cancelpayment" element={<CancelPayment />} />
+
     </Routes>
   );
 };

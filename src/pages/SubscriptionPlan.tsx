@@ -90,10 +90,12 @@ export default function SubscriptionPlan() {
         window.location.href = checkoutUrl;
       } else {
         throw new Error('No checkout URL returned from server.');
+        
       }
     } catch (err: any) {
       console.error('Error in handleSubscribe:', err);
       setError(err.message || 'Failed to initiate subscription. Please try again.');
+      
       setIsProcessing(false);
     }
   };
