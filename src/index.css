@@ -15,19 +15,19 @@ html, body {
 .swiper-button-next,
 .swiper-button-prev {
   color: #FCED08 !important;
-  transform: scale(1.2); /* use transform instead of invalid `scale` property */
+  transform: scale(1.2); 
 }
 
 .number-label {
   position: absolute;
   top: 3rem;
-  left: -0.6rem; /* Adjust spacing */
+  left: -0.6rem;
   font-size: 6rem;
   font-weight: 900;
-  color: black; /* Grey text */
+  color: black; 
   z-index: 10;
   line-height: 1;
-  -webkit-text-stroke: 2px white; /* Black border */
-  text-stroke: 2px white;          /* For non-webkit browsers */
+  -webkit-text-stroke: 2px white; 
+  text-stroke: 2px white;        
   pointer-events: none;
 }

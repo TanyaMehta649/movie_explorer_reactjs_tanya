@@ -63,7 +63,7 @@ const FilterPanel: React.FC = () => {
 
     try {
       await deleteMovie(movieId);
-      // Refetch after deletion
+      
       if (searchTerm === '' && selectedGenre === 'All') {
         const results = await getAllMoviesPagination(currentPage);
         setFilteredMovies(results.movies);
@@ -108,7 +108,7 @@ const FilterPanel: React.FC = () => {
         </button>
       </div>
 
-      {/* Genre Buttons */}
+     
       <div className="flex flex-wrap gap-4 justify-center my-6 w-full">
         {genres.map((genre) => (
           <button

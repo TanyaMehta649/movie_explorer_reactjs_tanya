@@ -127,12 +127,12 @@ const Header: FC = () => {
         </a>
       </div>
 
-      {/* Hamburger */}
+   
       <button className="sm:hidden" onClick={() => setNavOpen(!navOpen)}>
         {navOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
       </button>
 
-      {/* Links */}
+    
       <nav className={`flex-col sm:flex-row sm:flex ${navOpen ? 'flex' : 'hidden'} sm:items-center flex w-full sm:w-auto justify-center items-start gap-4 sm:gap-6 text-sm sm:flex-wrap mt-4 sm:mt-0`}>
         <Link to="/dashboard" className="text-white font-medium border-b border-white pb-0.5 whitespace-nowrap">Home</Link>
         <Link to="/filterpanel" className="text-gray-400 hover:text-white whitespace-nowrap">Genre</Link>
@@ -144,9 +144,9 @@ const Header: FC = () => {
         )}
       </nav>
 
-      {/* Profile + Notifications */}
+   
       <div className="relative flex items-center space-x-10 z-50">
-        {/* Notification Bell */}
+      
         <div
           title="Notifications"
           className="relative cursor-pointer"
@@ -163,7 +163,7 @@ const Header: FC = () => {
           )}
         </div>
 
-        {/* Notification Dropdown */}
+
         {showNotifications && (
           <div
             ref={notificationRef}
@@ -188,12 +188,12 @@ const Header: FC = () => {
           </div>
         )}
 
-        {/* Profile Icon */}
+      
         <div title="Profile">
           <User className="w-5 h-5 cursor-pointer" onClick={() => setShowDropdown(prev => !prev)} />
         </div>
 
-        {/* Profile Dropdown */}
+
         <div
           ref={dropdownRef}
           className={`absolute top-12 right-0 sm:right-2 bg-black text-yellow rounded-xl shadow-xl p-4 w-64 max-w-[90vw] z-[1000] border border-yellow-500 transition-all duration-200 ${showDropdown ? "opacity-100 visible" : "opacity-0 invisible"}`}
