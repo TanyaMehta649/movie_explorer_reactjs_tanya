@@ -48,7 +48,7 @@ const MovieItemCard: React.FC<Props> = ({
   };
 
   return (
-    <div className="w-45 min-h-[320px] max-h-[320px] flex flex-col">
+    <div className="w-40 min-h-[320px] max-h-[320px] flex flex-col">
       <div
         className="relative w-full aspect-[2/3] cursor-pointer"
         onClick={handleCardClick}
