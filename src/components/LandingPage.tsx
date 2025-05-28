@@ -143,21 +143,26 @@ const LandingPage: React.FC = () => {
           </button>
         </div>
 
-        <div className="absolute bottom-16 sm:bottom-20 left-[74%] -translate-x-1/2 z-30 flex gap-4">
-          {[
-            (current - 1 + initialMovies.length) % initialMovies.length,
-            current,
-            (current + 1) % initialMovies.length,
-          ].map((index) => (
-            <img
-              key={initialMovies[index].id}
-              src={initialMovies[index].poster_url}
-              alt={initialMovies[index].title}
-              onClick={() => setCurrent(index)}
-              className={`w-40 h-50 rounded-lg object-cover cursor-pointer shadow transition-all duration-300 border-2 ${index === current ? 'border-white ' : 'hover:opacity-100'}`}
-            />
-          ))}
-        </div>
+       {initialMovies.length >= 3 && (
+  <div className="absolute bottom-16 sm:bottom-20 left-[74%] -translate-x-1/2 z-30 flex gap-4">
+    {[
+      (current - 1 + initialMovies.length) % initialMovies.length,
+      current,
+      (current + 1) % initialMovies.length,
+    ].map((index) => (
+      <img
+        key={initialMovies[index].id}
+        src={initialMovies[index].poster_url}
+        alt={initialMovies[index].title}
+        onClick={() => setCurrent(index)}
+        className={`w-40 h-50 rounded-lg object-cover cursor-pointer shadow transition-all duration-300 border-2 ${
+          index === current ? 'border-white ' : 'hover:opacity-100'
+        }`}
+      />
+    ))}
+  </div>
+)}
+
       </div>
     </div>
   );

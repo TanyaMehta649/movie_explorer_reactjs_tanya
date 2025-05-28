@@ -2,6 +2,11 @@
   content: ['./src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+        header: ['Poppins', 'sans-serif'],
+       
+      },
       keyframes: {
         slidein: {
           '0%': { opacity: '0', transform: 'translateY(100px)', filter: 'blur(33px)' },

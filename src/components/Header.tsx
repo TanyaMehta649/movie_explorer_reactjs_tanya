@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import logo from '../assets/logo.png';
 import { getSubscriptionStatus } from '../services/Subscription';
 import { onMessage, messaging } from "../Notifications/firebase";
+import { toast } from "react-toastify";
 
 const Header: FC = () => {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -16,6 +17,7 @@ const Header: FC = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const notificationRef = useRef<HTMLDivElement>(null);
+  
   const navigate = useNavigate();
 
   const isLoggedIn = !!userData?.email;
@@ -91,20 +93,24 @@ const Header: FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+ 
   useEffect(() => {
-    const unsubscribe = onMessage(messaging, (payload) => {
-      console.log("Foreground notification in Header:", payload);
-      const { title, body } = payload.notification || {};
-      if (title && body) {
-        setNotifications((prev) => [...prev, { title, body }]);
-        setUnreadCount((prev) => prev + 1);
-      }
-    });
+  const unsubscribe = onMessage(messaging, (payload) => {
+    console.log("Foreground notification received:", payload);
+    const { title, body } = payload.notification || {};
 
-    return () => {
-      if (typeof unsubscribe === "function") unsubscribe();
-    };
-  }, []);
+    if (title && body) {
+      toast.info(`${title}: ${body}`);
+      setNotifications((prev) => [...prev, { title, body }]);
+      setUnreadCount((prev) => prev + 1);
+    }
+  });
+
+  return () => {
+    if (typeof unsubscribe === "function") unsubscribe();
+  };
+}, []);
+
 
   const handleLogout = () => {
     localStorage.removeItem('user');
@@ -126,69 +132,25 @@ const Header: FC = () => {
           <img src={logo} className="h-10 w-10 object-contain" />
         </a>
       </div>
-
-   
       <button className="sm:hidden" onClick={() => setNavOpen(!navOpen)}>
         {navOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
       </button>
 
-    
+      
       <nav className={`flex-col sm:flex-row sm:flex ${navOpen ? 'flex' : 'hidden'} sm:items-center flex w-full sm:w-auto justify-center items-start gap-4 sm:gap-6 text-sm sm:flex-wrap mt-4 sm:mt-0`}>
-        <Link to="/dashboard" className="text-white font-medium border-b border-white pb-0.5 whitespace-nowrap">Home</Link>
-        <Link to="/filterpanel" className="text-gray-400 hover:text-white whitespace-nowrap">Genre</Link>
+        <Link to="/dashboard" className="text-white font-bold  border-white pb-0.5 whitespace-nowrap">Home</Link>
+        <Link to="/filterpanel" className="text-gray-400 font-extrabold hover:text-white whitespace-nowrap">Genre</Link>
         {role !== "supervisor" && isLoggedIn && (
-          <Link to="/subscription" className="text-gray-400 hover:text-white whitespace-nowrap">Subscription</Link>
+          <Link to="/subscription" className="text-gray-400 font-extrabold hover:text-white whitespace-nowrap">Subscription Plan</Link>
         )}
         {role === 'supervisor' && isLoggedIn && (
-          <Link to='/addmovie' className="text-white hover:text-white whitespace-nowrap">+Movie</Link>
+          <Link to='/addmovie' className="text-white font-extrabold hover:text-white whitespace-nowrap">+Movie</Link>
         )}
       </nav>
 
-   
-      <div className="relative flex items-center space-x-10 z-50">
+     
       
-        <div
-          title="Notifications"
-          className="relative cursor-pointer"
-          onClick={() => {
-            setShowNotifications((prev) => !prev);
-            setUnreadCount(0);
-          }}
-        >
-          <Bell className="w-5 h-5 text-white hover:text-yellow-400 transition" />
-          {unreadCount > 0 && (
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
-              {unreadCount}
-            </span>
-          )}
-        </div>
-
-
-        {showNotifications && (
-          <div
-            ref={notificationRef}
-            className="absolute top-12 right-14 sm:right-16 w-80 max-w-[90vw] bg-gray-900 border border-yellow-400 rounded-lg shadow-lg z-[1000]"
-          >
-            <div className="p-3 font-semibold border-b border-yellow-400 text-yellow-300">
-              Notifications
-            </div>
-            {notifications.length === 0 ? (
-              <div className="p-4 text-sm text-gray-400">No notifications</div>
-            ) : (
-              notifications.map((n, index) => (
-                <div
-                  key={index}
-                  className="p-4 border-b border-gray-700 hover:bg-gray-800 transition"
-                >
-                  <p className="font-semibold text-white">{n.title}</p>
-                  <p className="text-sm text-gray-300">{n.body}</p>
-                </div>
-              ))
-            )}
-          </div>
-        )}
-
-      
+     
         <div title="Profile">
           <User className="w-5 h-5 cursor-pointer" onClick={() => setShowDropdown(prev => !prev)} />
         </div>
@@ -227,7 +189,7 @@ const Header: FC = () => {
             </>
           )}
         </div>
-      </div>
+      
     </header>
   );
 };

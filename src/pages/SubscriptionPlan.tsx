@@ -1,9 +1,10 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Plan } from '../pages/Types';
 import { createSubscription } from '../services/Subscription';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import tick from '../assets/checked.png';
 
 export default function SubscriptionPlan() {
   window.scrollTo(0, 0);
@@ -12,6 +13,8 @@ export default function SubscriptionPlan() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isPremiumActive, setIsPremiumActive] = useState(false);
+  const [userPlanId, setUserPlanId] = useState<string | null>(null);
   const confirmRef = useRef<HTMLDivElement>(null);
 
   const plans: Plan[] = [
@@ -63,15 +66,36 @@ export default function SubscriptionPlan() {
     return token && !isTokenExpired(token);
   })();
 
+  useEffect(() => {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      try {
+        const parsedUser = JSON.parse(userData);
+        if (parsedUser.plan && parsedUser.plan !== 'free') {
+          setIsPremiumActive(true);
+          setUserPlanId(parsedUser.plan);
+        }
+      } catch (err) {
+        console.error('Failed to parse user data:', err);
+      }
+    }
+  }, []);
+
   const handlePlanClick = (planId: string) => {
     if (!isLoggedIn) {
       toast.error('Please login to select a subscription plan!');
       return;
     }
+
+    if (isPremiumActive) {
+      toast.error('You already have an active premium subscription.');
+      return;
+    }
+
     setSelectedPlan(planId);
     setTimeout(() => {
       confirmRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    },);
+    });
   };
 
   const handleSubscribe = async () => {
@@ -90,12 +114,10 @@ export default function SubscriptionPlan() {
         window.location.href = checkoutUrl;
       } else {
         throw new Error('No checkout URL returned from server.');
-        
       }
     } catch (err: any) {
       console.error('Error in handleSubscribe:', err);
       setError(err.message || 'Failed to initiate subscription. Please try again.');
-      
       setIsProcessing(false);
     }
   };
@@ -125,64 +147,46 @@ export default function SubscriptionPlan() {
 
   return (
     <div className="bg-black text-white min-h-screen py-10 px-4">
-      <div className="max-w-5xl mx-auto text-center mb-10">
-        <h1 className="text-4xl font-bold mb-2">Choose your Plan</h1>
-        <p className="text-gray-400">Discover the perfect plan tailored just for you.</p>
+      <div className="max-w-4xl mx-auto text-center mb-10">
+        <h1 className="text-4xl font-bold mb-2">Discover the perfect plan tailored just for you</h1>
+        {isPremiumActive && (
+          <p className="text-yellow-400 mt-2 text-sm">You already have an active premium plan: <strong>{userPlanId}</strong></p>
+        )}
       </div>
 
       <div className="flex flex-wrap justify-center gap-8 mb-10">
         {plans.map((plan) => (
-          <div key={plan.id} className="relative w-[90%] max-w-[320px] sm:w-[280px] rounded-xl transition-all group">
-            <div
-              className={`absolute inset-0 rounded-xl blur-xl opacity-50 transition duration-500 group-hover:opacity-90 group-hover:scale-105 ${
-                plan.popular
-                  ? 'bg-gradient-to-tr from-green-400 via-emerald-500 to-lime-400'
-                  : 'bg-gradient-to-tr from-pink-500 to-red-500'
-              }`}
-            ></div>
-
-            <div
-              className={`relative z-10 bg-white/10 backdrop-blur-xl text-white rounded-xl shadow-xl border border-white/10 p-6 transition-transform duration-300 group-hover:-translate-y-1 ${
-                selectedPlan === plan.id ? 'ring-2 ring-red-600' : ''
+          <div key={plan.id} className="bg-gray-900 border-2 border-white/10 hover:border-yellow-400 rounded-xl w-[280px] text-center p-6 shadow-lg hover:scale-105 transition-all duration-300">
+            <h3 className="text-yellow-400 font-semibold mb-2 text-xl">{plan.name}</h3>
+            <p className="text-gray-400 text-sm mb-2">{plan.duration}</p>
+            <p className="text-3xl font-bold mb-4">{plan.price} <span className="text-sm font-light">/Month</span></p>
+            <ul className="text-sm text-left space-y-2 mb-4">
+              {plan.features.map((f, i) => (
+                <li key={i} className="flex items-center gap-2">
+                  <img src={tick} alt="tick" className="w-4 h-4" />
+                  {f}
+                </li>
+              ))}
+            </ul>
+            <button
+              onClick={() => handlePlanClick(plan.id)}
+              disabled={isPremiumActive}
+              className={`w-full py-2 rounded font-semibold transition ${
+                isPremiumActive
+                  ? 'bg-gray-600 cursor-not-allowed text-white'
+                  : selectedPlan === plan.id
+                    ? 'bg-yellow-500 text-white'
+                    : 'bg-yellow-500 hover:bg-yellow-600 text-black'
               }`}
             >
-              {plan.popular && (
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-green-500 text-xs px-3 py-1 rounded-b-full font-bold shadow-lg">
-                  MOST POPULAR
-                </div>
-              )}
-              <h2 className="text-xl font-semibold mb-1">{plan.name}</h2>
-              <p className="text-gray-300 text-sm mb-2">{plan.duration}</p>
-              <p className="text-3xl font-bold mb-4">
-                {plan.price} <span className="text-sm font-light">/ month</span>
-              </p>
-              <ul className="text-sm space-y-2 mb-4">
-                {plan.features.map((f, idx) => (
-                  <li key={idx} className="flex items-center gap-2">
-                    ✅ {f}
-                  </li>
-                ))}
-              </ul>
-              <button
-                onClick={() => handlePlanClick(plan.id)}
-                className={`w-full py-2 rounded-md font-semibold transition ${
-                  selectedPlan === plan.id
-                    ? 'bg-red-600 text-white'
-                    : 'bg-white/10 hover:bg-white/20 text-white'
-                }`}
-              >
-                {selectedPlan === plan.id ? 'Selected' : 'Get it now'}
-              </button>
-            </div>
+              {isPremiumActive ? 'Already Subscribed' : selectedPlan === plan.id ? 'Selected' : 'Get it now'}
+            </button>
           </div>
         ))}
       </div>
 
-      {selectedPlan && (
-        <div
-          ref={confirmRef}
-          className="max-w-3xl mx-auto bg-gray-800 p-6 rounded-lg border border-white/10"
-        >
+      {selectedPlan && !isPremiumActive && (
+        <div ref={confirmRef} className="max-w-3xl mx-auto bg-gray-800 p-6 rounded-lg border border-white/10">
           <h2 className="text-2xl font-bold mb-2">Confirm Your Subscription</h2>
           <p className="text-gray-300 mb-4">
             You have selected the {plans.find((p) => p.id === selectedPlan)?.name} plan for{' '}
@@ -192,7 +196,7 @@ export default function SubscriptionPlan() {
           <button
             onClick={handleSubscribe}
             disabled={isProcessing}
-            className="bg-red-600 hover:bg-red-700 text-white w-full py-3 rounded flex items-center justify-center gap-2"
+            className="bg-yellow-600 hover:bg-yellow-700 text-white w-full py-3 rounded flex items-center justify-center gap-2"
           >
             {isProcessing ? (
               <>

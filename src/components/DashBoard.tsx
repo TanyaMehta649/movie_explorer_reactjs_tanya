@@ -28,7 +28,7 @@ function DashBoard() {
 
       {role !== 'supervisor' && <SubscriptionPlan />}
 
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
@@ -21,6 +20,8 @@ const Success = () => {
       localStorage.setItem("user", JSON.stringify(parsedUser));
     }
   };
+  
+
 
   useEffect(() => {
     const verifySubscription = async () => {

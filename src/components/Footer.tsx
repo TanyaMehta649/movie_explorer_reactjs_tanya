@@ -44,7 +44,7 @@ const Footer: FC = () => {
       </div>
 
      
-      <div className="mt-16 border-t border-gray-700 pt-6 text-center text-xs text-gray-500">
+      <div className="mt-16 border-t border-yellow-400  pt-6 text-center text-xs text-yellow-400">
         &copy; {new Date().getFullYear()} Movie Explorer. All rights reserved.
       </div>
     </footer>

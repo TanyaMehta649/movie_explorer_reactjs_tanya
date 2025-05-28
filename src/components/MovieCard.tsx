@@ -32,30 +32,58 @@ const MovieCard: React.FC = () => {
     fetchMovies(page);
   }, []);
 
-  const fetchMovies = async (pageNum: number) => {
-    setLoading(true);
-    try {
-      const res = await getAllMoviesPagination(pageNum);
-      const updatedMovies = pageNum === 1 ? res.movies : [...movies, ...res.movies];
+       
+  
+const fetchMovies = async (pageNum: number) => {
+  setLoading(true);
+  try {
+    const res = await getAllMoviesPagination(pageNum);
 
-      setMovies(updatedMovies);
-      setRecommended(
-        updatedMovies.filter((movie) =>
-          ['Action', 'Adventure', 'Romance'].some((genre) =>
-            movie.genre.includes(genre)
-          )
-        )
-      );
-      setFeaturedSeries(updatedMovies.filter((movie) => movie.rating >= 3));
-      setJustAdded(updatedMovies.filter((movie) => movie.release_year >= 2021));
-      setTotalPages(res.pagination.total_pages);
-      setPage(res.pagination.current_page);
-    } catch (error) {
-      console.error('Error fetching movies:', error);
-    } finally {
-      setLoading(false);
+    const updatedMovies = pageNum === 1 ? res.movies : [...movies, ...res.movies];
+
+   
+    const recommendedList: Movie[] = [];
+    const featuredList: Movie[] = [];
+
+    const recommendedGenres = ['Action', 'Adventure', 'Romance'];
+
+   
+    const recommendedIds = new Set<number>();
+
+    
+    for (const movie of updatedMovies) {
+      if (
+        recommendedGenres.some((genre) => movie.genre.includes(genre)) &&
+        !recommendedIds.has(movie.id)
+      ) {
+        recommendedList.push(movie);
+        recommendedIds.add(movie.id);
+      }
     }
-  };
+
+   
+    for (const movie of updatedMovies) {
+      if (movie.rating >= 3 && !recommendedIds.has(movie.id)) {
+        featuredList.push(movie);
+      }
+    }
+
+ 
+    const justAddedList = updatedMovies.filter((movie) => movie.release_year >= 2021);
+
+    
+    setMovies(updatedMovies);
+    setRecommended(recommendedList);
+    setFeaturedSeries(featuredList);
+    setJustAdded(justAddedList);
+    setTotalPages(res.pagination.total_pages);
+    setPage(res.pagination.current_page);
+  } catch (error) {
+    console.error('Error fetching movies:', error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const loadMore = () => {
     if (page < totalPages) {
@@ -77,7 +105,7 @@ const MovieCard: React.FC = () => {
             )
           )
         );
-        setFeaturedSeries(updatedMovies.filter((movie) => movie.rating >= 9));
+        setFeaturedSeries(updatedMovies.filter((movie) => movie.rating >= 10));
         setJustAdded(updatedMovies.filter((movie) => movie.release_year >= 2021));
         alert('Movie deleted successfully!');
       } catch (error) {
@@ -157,8 +185,8 @@ const MovieCard: React.FC = () => {
 
   return (
     <div className="bg-black text-white py-10 px-6">
-      {renderSection('Recommended For You', recommended, 5)}
-      {renderSection('Featured Series', featuredSeries, 6)}
+      {renderSection('Recommended For You', recommended, 7)}
+      {renderSection('Featured Series', featuredSeries, 7)}
       {renderSection('Just Added', justAdded, 5, true)}
     </div>
   );
