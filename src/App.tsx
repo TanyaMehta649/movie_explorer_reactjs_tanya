@@ -8,6 +8,8 @@ import Footer from "./components/Footer";
 import Carousel from './components/LandingPage';
 import { generateToken, messaging, onMessage } from './Notifications/firebase';
 import { BrowserRouter, useLocation } from "react-router-dom";
+import './i18n'; // Ensure this is imported once
+
 
 function LayoutWrapper() {
   const location = useLocation();

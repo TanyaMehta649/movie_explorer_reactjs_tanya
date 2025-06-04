@@ -132,14 +132,14 @@ const fetchMovies = async (pageNum: number) => {
       <div className="mb-12 px-4">
         <h2 className="text-white text-lg font-semibold mb-4">{title}</h2>
         <Swiper
-          modules={[Navigation, FreeMode, Mousewheel]}
+          modules={[Navigation, FreeMode]}
           navigation
           spaceBetween={20}
           grabCursor={true}
           simulateTouch={true}
           allowTouchMove={true}
           freeMode={true}
-          mousewheel={true}
+        
           cssMode={false}
           slidesPerView={Math.min(sectionMovies.length, slidesPerView)}
           breakpoints={{

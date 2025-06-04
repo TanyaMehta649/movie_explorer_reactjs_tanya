@@ -1,11 +1,11 @@
 
 import { FC, useState, useRef, useEffect } from "react";
-import { User, Menu, X, Bell } from "lucide-react";
+import { User, Menu, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from '../assets/logo.png';
 import { getSubscriptionStatus } from '../services/Subscription';
 import { onMessage, messaging } from "../Notifications/firebase";
-import { toast } from "react-toastify";
+import { useTranslation } from 'react-i18next';
 
 const Header: FC = () => {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -17,7 +17,7 @@ const Header: FC = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const notificationRef = useRef<HTMLDivElement>(null);
-  
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
 
   const isLoggedIn = !!userData?.email;
@@ -26,23 +26,23 @@ const Header: FC = () => {
     const fetchSubscription = async () => {
       const token = localStorage.getItem('token');
       if (!token) {
-        setPlanInfo({ type: 'Not available', duration: '' });
+        setPlanInfo({ type: t('not_available'), duration: '' });
         return;
       }
 
       try {
         const data = await getSubscriptionStatus(token);
-        const planType = data.subscription?.plan_type || 'Not available';
+        const planType = data.subscription?.plan_type || t('not_available');
 
         let duration = '';
         if (data.subscription?.created_at && data.subscription?.expires_at) {
           const createdAt = new Date(data.subscription.created_at);
           const expiresAt = new Date(data.subscription.expires_at);
           const diff = Math.round((expiresAt.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24));
-          if (diff === 1) duration = '1 day';
-          else if (diff >= 27 && diff <= 31) duration = '1 month';
-          else if (diff >= 85 && diff <= 95) duration = '3 months';
-          else duration = `${diff} days`;
+          if (diff === 1) duration = t('one_day');
+          else if (diff >= 27 && diff <= 31) duration = t('one_month');
+          else if (diff >= 85 && diff <= 95) duration = t('three_months');
+          else duration = `${diff} ${t('days')}`;
         }
 
         setPlanInfo({ type: planType, duration });
@@ -53,7 +53,7 @@ const Header: FC = () => {
     };
 
     fetchSubscription();
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     const loadUser = () => {
@@ -93,24 +93,19 @@ const Header: FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
- 
   useEffect(() => {
-  const unsubscribe = onMessage(messaging, (payload) => {
-    console.log("Foreground notification received:", payload);
-    const { title, body } = payload.notification || {};
+    const unsubscribe = onMessage(messaging, (payload) => {
+      const { title, body } = payload.notification || {};
+      if (title && body) {
+        setNotifications((prev) => [...prev, { title, body }]);
+        setUnreadCount((prev) => prev + 1);
+      }
+    });
 
-    if (title && body) {
-      toast.info(`${title}: ${body}`);
-      setNotifications((prev) => [...prev, { title, body }]);
-      setUnreadCount((prev) => prev + 1);
-    }
-  });
-
-  return () => {
-    if (typeof unsubscribe === "function") unsubscribe();
-  };
-}, []);
-
+    return () => {
+      if (typeof unsubscribe === "function") unsubscribe();
+    };
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('user');
@@ -122,39 +117,75 @@ const Header: FC = () => {
     navigate('/');
   };
 
+  const toggleLanguage = () => {
+    i18n.changeLanguage(i18n.language === 'en' ? 'hi' : 'en');
+  };
+
   const { username, email, role } = userData;
   const { type: planType, duration } = planInfo;
 
   return (
-    <header className="bg-black text-white px-4 sm:px-6 py-4 flex items-center justify-between z-[100] relative flex-wrap sm:flex-nowrap gap-y-4">
+    <header className="bg-black text-white px-4 sm:px-6 py-3 flex items-center justify-between z-[100] relative flex-wrap sm:flex-nowrap gap-y-4">
       <div className="flex items-center space-x-4">
         <a href="/dashboard">
-          <img src={logo} className="h-10 w-10 object-contain" />
+          <img src={logo} className="h-10 w-10 object-contain" alt="logo" />
         </a>
       </div>
+
       <button className="sm:hidden" onClick={() => setNavOpen(!navOpen)}>
         {navOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
       </button>
 
-      
-      <nav className={`flex-col sm:flex-row sm:flex ${navOpen ? 'flex' : 'hidden'} sm:items-center flex w-full sm:w-auto justify-center items-start gap-4 sm:gap-6 text-sm sm:flex-wrap mt-4 sm:mt-0`}>
-        <Link to="/dashboard" className="text-white font-bold  border-white pb-0.5 whitespace-nowrap">Home</Link>
-        <Link to="/filterpanel" className="text-gray-400 font-extrabold hover:text-white whitespace-nowrap">Genre</Link>
+      <nav className={`flex-col sm:flex-row sm:flex ${navOpen ? 'flex' : 'hidden'} sm:items-center flex w-full sm:w-auto justify-center items-start gap-4 sm:gap-6 text-sm sm:flex-wrap mt-4 sm:mt-0 `}>
+        <Link to="/dashboard" className="text-white font-normal text-base sm:text-lg font-sans-serif border-white pb-0.5 whitespace-nowrap">
+          {t('home')}
+        </Link>
+
+        <Link to="/filterpanel" className="text-gray-400 font-normal text-base sm:text-lg font-sans-serif hover:text-white whitespace-nowrap">
+          {t('genre')}
+        </Link>
+
         {role !== "supervisor" && isLoggedIn && (
-          <Link to="/subscription" className="text-gray-400 font-extrabold hover:text-white whitespace-nowrap">Subscription Plan</Link>
+          <Link to="/subscription" className="text-gray-400 font-normal text-base sm:text-lg font-sans-serif hover:text-white whitespace-nowrap">
+            {t('subscription')}
+          </Link>
         )}
+
         {role === 'supervisor' && isLoggedIn && (
-          <Link to='/addmovie' className="text-white font-extrabold hover:text-white whitespace-nowrap">+Movie</Link>
+          <Link to='/addmovie' className="text-gray-400 font-normal text-base sm:text-lg font-sans-serif hover:text-white whitespace-nowrap">
+            +Movie
+          </Link>
         )}
       </nav>
 
-     
+      <div className="relative flex items-center space-x-6 z-50">
       
-     
-        <div title="Profile">
-          <User className="w-5 h-5 cursor-pointer" onClick={() => setShowDropdown(prev => !prev)} />
-        </div>
+        <button
+  onClick={toggleLanguage}
+  className="flex items-center bg-blue-100 rounded-full p-1 gap-1"
+>
+  <span
+    className={`flex items-center justify-center rounded-full w-7 h-7 text-sm font-semibold transition-all ${
+      i18n.language === 'en'
+        ? 'bg-blue-700 text-white'
+        : 'text-blue-700'
+    }`}
+  >
+    En
+  </span>
+  <span
+    className={`flex items-center justify-center rounded-full w-7 h-7 text-sm font-semibold transition-all ${
+      i18n.language === 'hi'
+        ? 'bg-blue-700 text-white'
+        : 'text-blue-700'
+    }`}
+  >
+    हिं
+  </span>
+</button>
 
+     
+        <User className="w-5 h-5 cursor-pointer" onClick={() => setShowDropdown(prev => !prev)} />
 
         <div
           ref={dropdownRef}
@@ -162,34 +193,34 @@ const Header: FC = () => {
         >
           {isLoggedIn ? (
             <>
-              <p className="font-semibold text-base sm:text-lg mb-1">Welcome, {username || "User"}</p>
-              <p className="text-sm text-yellow-300 break-words">Email: {email}</p>
-              <p className="text-sm text-yellow-300 break-words">Role: {role}</p>
+              <p className="font-semibold text-base sm:text-lg mb-1">{t('welcome')}, {username || "User"}</p>
+              <p className="text-sm text-yellow-300 break-words">{t('email')}: {email}</p>
+              <p className="text-sm text-yellow-300 break-words">{t('role')}: {role}</p>
               <p className="text-sm text-yellow-300 mb-4 break-words">
-                Plan: {planType} {duration ? `(${duration})` : ''}
+                {t('plan')}: {planType} {duration ? `(${duration})` : ''}
               </p>
               <button
                 onClick={handleLogout}
                 className="w-full bg-yellow-400 text-black font-semibold py-2 rounded hover:bg-yellow-300 transition"
               >
-                Logout
+                {t('logout')}
               </button>
             </>
           ) : (
             <>
-              <p className="font-semibold text-base sm:text-lg mb-2">Please login</p>
-              <p className="text-sm text-yellow-300 break-words">Role: Guest</p>
-              <p className="text-sm text-yellow-300 mb-4 break-words">Plan: Not available</p>
+              <p className="font-semibold text-base sm:text-lg mb-2">{t('please_login')}</p>
+              <p className="text-sm text-yellow-300 break-words">{t('role')}: Guest</p>
+              <p className="text-sm text-yellow-300 mb-4 break-words">{t('plan')}: {t('not_available')}</p>
               <button
                 onClick={handleLogin}
                 className="w-full bg-yellow-400 text-black font-semibold py-2 rounded hover:bg-yellow-300 transition"
               >
-                Login
+                {t('login')}
               </button>
             </>
           )}
         </div>
-      
+      </div>
     </header>
   );
 };

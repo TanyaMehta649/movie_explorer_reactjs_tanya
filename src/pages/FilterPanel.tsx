@@ -82,7 +82,7 @@ const FilterPanel: React.FC = () => {
 
   return (
     <div className="bg-black text-white min-h-screen py-10 px-6 sm:px-10 md:px-20 flex flex-col items-center max-w-screen-lg mx-auto">
-      {/* <div className="flex items-center w-full max-w-md bg-black rounded-full shadow-md px-4 py-2 border-2 border-yellow-400"> */}
+     
       <div className="flex items-center w-full max-w-xl bg-black rounded-full shadow-md px-4 py-2 border-2 border-yellow-400">
 
         <input
@@ -139,7 +139,7 @@ const FilterPanel: React.FC = () => {
         </div>
       ) : (
         <>
-          {/* <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 pb-8 min-h-[450px] w-full"> */}
+       
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pb-8 min-h-[450px] w-full">
 
             {filteredMovies.length > 0 ? (
